@@ -1,3 +1,4 @@
+import java.sql.SQLException;
 import java.util.Scanner;
 
 public class Main {
@@ -29,7 +30,7 @@ public class Main {
                     System.out.println("Enter valid option.");
                     continue;
             }
-            if(validUser(uId,password,designation)){
+            if(User.validate(uId,password, designation)){
                 switch (designation){
                     case 'A':
                         displayAdminView();
@@ -38,7 +39,7 @@ public class Main {
                         displayWorkerView();
                         break;
                     case 'C':
-                        displayCustomerView();
+                        displayCustomerView(uId);
                         break;
                 }
             }
@@ -111,9 +112,12 @@ public class Main {
                     int pickRate=sc.nextInt();
                     System.out.print("Enter Read Value: ");
                     int read=sc.nextInt();
+                    sc.nextLine();
                     String clothName=""+warpEnds+"_"+weftCount+"x"+warpCount+"_"+width+" ";
-                    //todo
-                    
+                    Cloth c=new Cloth(pick,weftCount,warpCount,warpEnds,width,pickRate,read,clothName);
+                    if(c.addCloth())
+                        System.out.println("Cloth Added Successful");
+                    else System.out.println("Try Again.");
                     break;
                 case "3":
                     displayWorkerView();
@@ -126,14 +130,102 @@ public class Main {
     }
 
     private static void displayWorkerView() {
-        System.out.println("Worker");
+        while(true){
+            System.out.println("-------------------------------------------------------------");
+            System.out.println("Menu:\n1. Cloth credit\n2. Weft debit\n3. Warp debit \n4. Amount debit \n5. Display \n6. Exit");
+            Transaction t;
+            String clothName;
+            String companyName;
+            switch (sc.nextLine()){
+                case "1":
+                    System.out.println("Enter Company Name: ");
+                    companyName=sc.nextLine();
+                    System.out.println("Enter Cloth Name: ");
+                    clothName=sc.nextLine();
+                    float meter=inputMeter();
+                    t=new Transaction(meter,0f);
+                    try {
+                        t.insertCreditedCloth(companyName,clothName);
+                    } catch (SQLException e) {
+                        System.out.println("Not Added\n"+e);
+                    }
+                    break;
+                case "2":
+                    System.out.println("Enter Company Name: ");
+                    companyName=sc.nextLine();
+                    System.out.println("Enter Cloth Name: ");
+                    clothName=sc.nextLine();
+                    float weight=inputWeight();
+                    t=new Transaction(0f,weight);
+                    try {
+                        t.insertWeftCredit(companyName,clothName);
+                    } catch (SQLException e) {
+                        System.out.println("Not Added\n"+e);
+                    }
+                    break;
+                case "3":
+                    System.out.println("Enter Company Name: ");
+                    companyName=sc.nextLine();
+                    meter=inputMeter();
+                    t=new Transaction(meter,0f);
+                    try {
+                        t.insertWarpCredit(companyName);
+                    } catch (SQLException e) {
+                        System.out.println("Not Added\n"+e);
+                    }
+                    break;
+                case "4":
+                    System.out.println("Enter Company Name: ");
+                    companyName=sc.nextLine();
+                    System.out.print("Enter Amount: ");
+                    float amount= sc.nextFloat();
+                    sc.nextLine();
+                    t=new Transaction(amount);
+                    try {
+                        t.insertAmountDebit(companyName);
+                    } catch (SQLException e) {
+                        System.out.println("Not Added\n"+e);
+                    }
+                    break;
+                case "5":
+                    System.out.println("Enter Company Name: ");
+                    companyName=sc.nextLine();
+                    System.out.print("Enter the Starting Date: ");
+                    String date=sc.nextLine();
+                    try {
+                        Worker.display(companyName,date);
+                    } catch (Exception e) {
+                        System.out.println("Error\n"+e);
+                    }
+                    break;
+                case "6":
+                    return;
+                default:
+                    System.out.println("Enter Valid Input.");
+            }
+        }
     }
 
-    private static void displayCustomerView() {
-        System.out.println("Customer");
+    private static void displayCustomerView(String id) {
+        System.out.println("Enter the Starting Date: ");
+        String date=sc.nextLine();
+        try {
+            Customer.display(id,date);
+        } catch (SQLException e) {
+            System.out.println("Error\n"+e);
+        }
+    }
+    public static float inputMeter(){
+        System.out.println("Enter Meter: ");
+        float meter=sc.nextFloat();
+        sc.nextLine();
+        return meter;
+    }
+    public static float inputWeight(){
+        System.out.println("Enter Weigh: ");
+        float weight=sc.nextFloat();
+        sc.nextLine();
+        return weight;
     }
 
-    private static boolean validUser(String uId, String password, char designation) {
-        return User.validate(uId,password, designation);
-    }
 }

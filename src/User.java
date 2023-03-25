@@ -1,13 +1,17 @@
 import java.sql.SQLException;
+import java.util.LinkedList;
+import java.util.List;
 
 public class User {
     private String name,address,mail,loginId,password,companyName;
     private long contactNo;
     private char designation;
 
-    public static boolean validate(){
-
-        return false;
+    public static void display(String companyName,String date) throws SQLException {
+        List<LinkedList<String>> lst=UserDAO.getDisplayDetails(companyName,date);
+        for (List<String> i:lst){
+            System.out.println(i.toString());
+        }
     }
     public User(String name, String address, String mail, String loginId, String password,String companyName, long contactNo, char designation) {
         this.name = name;
@@ -23,7 +27,7 @@ public class User {
     public static boolean validate(String uId, String password, char designation) {
         try {
             String pass=UserDAO.validate(uId,password,designation);
-            if(pass.equals(password))
+            if(password.equals(pass))
                 return true;
         } catch (SQLException e) {
             System.out.println(e);

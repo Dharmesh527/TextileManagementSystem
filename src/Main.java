@@ -112,6 +112,8 @@ public class Main {
                     System.out.print("Enter Read Value: ");
                     int read=sc.nextInt();
                     String clothName=""+warpEnds+"_"+weftCount+"x"+warpCount+"_"+width+" ";
+                    //todo
+                    
                     break;
                 case "3":
                     displayWorkerView();
